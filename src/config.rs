@@ -145,7 +145,7 @@ lazy_static::lazy_static! {
         //map.insert("allow-hide-cm".to_string(), "Y".to_string());
         //隐藏托盘图标，弃用
         //map.insert("hide-tray".to_string(), "Y".to_string());
-        //默认连接密码，弃用
+        //默认连接密码，弃用。
         //map.insert("default-connect-password".to_string(), "~Baidu1234456789~".to_string());
         RwLock::new(map)
     };
