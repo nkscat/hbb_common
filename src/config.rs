@@ -49,6 +49,13 @@ lazy_static::lazy_static! {
 type Size = (i32, i32, i32, i32);
 type KeyPair = (Vec<u8>, Vec<u8>);
 
+//替换为以下：
+//（“DEFAULT_XXXX”下代码同样可以给 “OVERWRITE_XXXX“使用，写入“OVERWRITE_XXXX”后客户端无法更改其设置）
+//详细设置作用说明参考：https://rustdesk.com/docs/zh-cn/self-host/client-configuration/advanced-settings/
+//                    https://rustdesk.com/docs/en/self-host/client-configuration/advanced-settings/
+//我只添加核对了部设置参数,有其他需求的可以参考上面文档后自行添加
+//对应设置应该写入那个方法块，参考pub mod keys方法块后半段注释
+//默认值设置PIN解锁，需要配合PIN修复代码块使用
 lazy_static::lazy_static! {
     static ref CONFIG: RwLock<Config> = RwLock::new(Config::load());
     static ref CONFIG2: RwLock<Config2> = RwLock::new(Config2::load());
@@ -56,20 +63,92 @@ lazy_static::lazy_static! {
     static ref STATUS: RwLock<Status> = RwLock::new(Status::load());
     static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());
-    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
+    //ID服务器，所有客户端生效
+    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("rd.t.nk:21116".to_owned());
+    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("rd.t.nk:21116".to_owned());
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
-    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        //ID服务器，该配置部分客户端生效，弃用
+        //map.insert("custom-rendezvous-server".to_string(), "rd.t.nk:21114".to_string());
+        //中继服务器，弃用
+        //map.insert("relay-server".to_string(), "rd.t.nk:21117".to_string());
+        //API服务器，弃用
+        //map.insert("api-server".to_string(), "https://rd.t.nk:21114".to_string());
+        //KEY，弃用
+        //map.insert("key".to_string(), "kmVyiuofN7pwlsAoSF2AArxhgddSebUsPwGGmIvoyc=".to_string());
+        //PIN解锁，需要配合PIN修复代码块使用
+        map.insert("unlock_pin".to_string(), "23232".to_string());
+        //访问模式，custom：自定义，full：完全控制，view：共享屏幕
+        map.insert("access-mode".to_string(), "full".to_string());
+        //允许远程重启
+        map.insert("enable-remote-restart".to_string(), "Y".to_string());
+        //允许远程修改配置
+        map.insert("allow-remote-config-modification".to_string(), "Y".to_string());
+        //接受远程方式，password：密码，click：点击，password-click：同时使用
+        map.insert("approve-mode".to_string(), "password".to_string());
+        //密码验证方式，use-temporary-password：一次性密码，use-permanent-password：固定密码，use-both-passwords：同时使用
+        map.insert("verification-method".to_string(), "use-permanent-password".to_string());
+        //使用DirectX捕获屏幕
+        map.insert("enable-directx-capture".to_string(), "Y".to_string());
+        //预设地址簿名称，弃用
+        //map.insert("preset-address-book-name".to_string(), "百度本地生活".to_string());
+        //预设地址簿标签，弃用
+        //map.insert("preset-address-book-tag".to_string(), "收银机".to_string());
+        RwLock::new(map)
+    };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        //显示模式，adaptive：适应窗口，original：原始尺寸，
+        map.insert("view_style".to_string(), "adaptive".to_string());
+        RwLock::new(map)
+    };
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        //使用D3D渲染
+        map.insert("allow-d3d-render".to_string(), "Y".to_string());
+        //禁用启动时检查软件更新
+        map.insert("enable-check-update".to_string(), "N".to_string());
+        //禁用自动更新
+        map.insert("allow-auto-update".to_string(), "N".to_string());
+        //禁用UDP打洞
+        map.insert("enable-udp-punch".to_string(), "N".to_string());
+        //禁用IPv6 P2P连接
+        map.insert("enable-ipv6-punch".to_string(), "N".to_string());
+        //禁用发现选项卡
+        map.insert("disable-discovery-panel".to_string(), "Y".to_string());
+        //禁用默认提权运行
+        map.insert("pre-elevate-service".to_string(), "N".to_string());
+        //禁用被控端更改连接权限
+        map.insert("allow-remote-cm-modification".to_string(), "N".to_string());
+        RwLock::new(map)
+    };
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        //被控默认密码，弃用
+        //map.insert("password".to_string(), "~Baidu1234456789~".to_string());
+        RwLock::new(map)
+    };
+    pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = {
+        let mut map = HashMap::new();
+        //预设用户名称
+        map.insert("preset-user-name".to_string(), "nk".to_string());
+        //预设设备组名称，弃用
+        //map.insert("preset-device-group-name".to_string(), "百度设备".to_string());
+        //隐藏连接管理窗口，不生效，项目中确实有该字段的配置信息，但是无法在此处定义，希望大神能解决，弃用
+        //map.insert("allow-hide-cm".to_string(), "Y".to_string());
+        //隐藏托盘图标，弃用
+        //map.insert("hide-tray".to_string(), "Y".to_string());
+        //默认连接密码，弃用
+        //map.insert("default-connect-password".to_string(), "~Baidu1234456789~".to_string());
+        RwLock::new(map)
+    };
 }
 
 lazy_static::lazy_static! {
@@ -443,7 +522,7 @@ fn patch(path: PathBuf) -> PathBuf {
     path
 }
 
-impl Config2 {
+//替换为以下：
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
@@ -453,6 +532,12 @@ impl Config2 {
             socks.password = password;
             config.socks = Some(socks);
             store |= store2;
+        }
+        // 若 unlock_pin 为空，则回退到 DEFAULT_SETTINGS 中的值
+        if config.unlock_pin.is_empty() {
+            if let Some(default_pin) = DEFAULT_SETTINGS.read().unwrap().get("unlock_pin") {
+                config.unlock_pin = default_pin.clone();
+            }
         }
         let (unlock_pin, _, store2) =
             decrypt_str_or_original(&config.unlock_pin, PASSWORD_ENC_VERSION);
