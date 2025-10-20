@@ -522,6 +522,7 @@ fn patch(path: PathBuf) -> PathBuf {
     path
 }
 
+impl Config2 {
 //替换为以下：
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
