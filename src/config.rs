@@ -49,13 +49,13 @@ lazy_static::lazy_static! {
 type Size = (i32, i32, i32, i32);
 type KeyPair = (Vec<u8>, Vec<u8>);
 
-//Ìæ»»ÎªÒÔÏÂ£º
-//£¨¡°DEFAULT_XXXX¡±ÏÂ´úÂëÍ¬Ñù¿ÉÒÔ¸ø ¡°OVERWRITE_XXXX¡°Ê¹ÓÃ£¬Ğ´Èë¡°OVERWRITE_XXXX¡±ºó¿Í»§¶ËÎŞ·¨¸ü¸ÄÆäÉèÖÃ£©
-//ÏêÏ¸ÉèÖÃ×÷ÓÃËµÃ÷²Î¿¼£ºhttps://rustdesk.com/docs/zh-cn/self-host/client-configuration/advanced-settings/
+//æ›¿æ¢ä¸ºä»¥ä¸‹ï¼š
+//ï¼ˆâ€œDEFAULT_XXXXâ€ä¸‹ä»£ç åŒæ ·å¯ä»¥ç»™ â€œOVERWRITE_XXXXâ€œä½¿ç”¨ï¼Œå†™å…¥â€œOVERWRITE_XXXXâ€åå®¢æˆ·ç«¯æ— æ³•æ›´æ”¹å…¶è®¾ç½®ï¼‰
+//è¯¦ç»†è®¾ç½®ä½œç”¨è¯´æ˜å‚è€ƒï¼šhttps://rustdesk.com/docs/zh-cn/self-host/client-configuration/advanced-settings/
 //                    https://rustdesk.com/docs/en/self-host/client-configuration/advanced-settings/
-//ÎÒÖ»Ìí¼ÓºË¶ÔÁË²¿ÉèÖÃ²ÎÊı,ÓĞÆäËûĞèÇóµÄ¿ÉÒÔ²Î¿¼ÉÏÃæÎÄµµºó×ÔĞĞÌí¼Ó
-//¶ÔÓ¦ÉèÖÃÓ¦¸ÃĞ´ÈëÄÇ¸ö·½·¨¿é£¬²Î¿¼pub mod keys·½·¨¿éºó°ë¶Î×¢ÊÍ
-//Ä¬ÈÏÖµÉèÖÃPIN½âËø£¬ĞèÒªÅäºÏPINĞŞ¸´´úÂë¿éÊ¹ÓÃ
+//æˆ‘åªæ·»åŠ æ ¸å¯¹äº†éƒ¨è®¾ç½®å‚æ•°,æœ‰å…¶ä»–éœ€æ±‚çš„å¯ä»¥å‚è€ƒä¸Šé¢æ–‡æ¡£åè‡ªè¡Œæ·»åŠ 
+//å¯¹åº”è®¾ç½®åº”è¯¥å†™å…¥é‚£ä¸ªæ–¹æ³•å—ï¼Œå‚è€ƒpub mod keysæ–¹æ³•å—ååŠæ®µæ³¨é‡Š
+//é»˜è®¤å€¼è®¾ç½®PINè§£é”ï¼Œéœ€è¦é…åˆPINä¿®å¤ä»£ç å—ä½¿ç”¨
 lazy_static::lazy_static! {
     static ref CONFIG: RwLock<Config> = RwLock::new(Config::load());
     static ref CONFIG2: RwLock<Config2> = RwLock::new(Config2::load());
@@ -63,7 +63,7 @@ lazy_static::lazy_static! {
     static ref STATUS: RwLock<Status> = RwLock::new(Status::load());
     static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    //ID·şÎñÆ÷£¬ËùÓĞ¿Í»§¶ËÉúĞ§
+    //IDæœåŠ¡å™¨ï¼Œæ‰€æœ‰å®¢æˆ·ç«¯ç”Ÿæ•ˆ
     pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("rd.t.nk:21116".to_owned());
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("rd.t.nk:21116".to_owned());
     pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
@@ -72,80 +72,80 @@ lazy_static::lazy_static! {
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
     pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = {
         let mut map = HashMap::new();
-        //ID·şÎñÆ÷£¬¸ÃÅäÖÃ²¿·Ö¿Í»§¶ËÉúĞ§£¬ÆúÓÃ
+        //IDæœåŠ¡å™¨ï¼Œè¯¥é…ç½®éƒ¨åˆ†å®¢æˆ·ç«¯ç”Ÿæ•ˆï¼Œå¼ƒç”¨
         //map.insert("custom-rendezvous-server".to_string(), "rd.t.nk:21114".to_string());
-        //ÖĞ¼Ì·şÎñÆ÷£¬ÆúÓÃ
+        //ä¸­ç»§æœåŠ¡å™¨ï¼Œå¼ƒç”¨
         //map.insert("relay-server".to_string(), "rd.t.nk:21117".to_string());
-        //API·şÎñÆ÷£¬ÆúÓÃ
+        //APIæœåŠ¡å™¨ï¼Œå¼ƒç”¨
         //map.insert("api-server".to_string(), "https://rd.t.nk:21114".to_string());
-        //KEY£¬ÆúÓÃ
+        //KEYï¼Œå¼ƒç”¨
         //map.insert("key".to_string(), "kmVyiuofN7pwlsAoSF2AArxhgddSebUsPwGGmIvoyc=".to_string());
-        //PIN½âËø£¬ĞèÒªÅäºÏPINĞŞ¸´´úÂë¿éÊ¹ÓÃ
+        //PINè§£é”ï¼Œéœ€è¦é…åˆPINä¿®å¤ä»£ç å—ä½¿ç”¨
         map.insert("unlock_pin".to_string(), "23232".to_string());
-        //·ÃÎÊÄ£Ê½£¬custom£º×Ô¶¨Òå£¬full£ºÍêÈ«¿ØÖÆ£¬view£º¹²ÏíÆÁÄ»
+        //è®¿é—®æ¨¡å¼ï¼Œcustomï¼šè‡ªå®šä¹‰ï¼Œfullï¼šå®Œå…¨æ§åˆ¶ï¼Œviewï¼šå…±äº«å±å¹•
         map.insert("access-mode".to_string(), "full".to_string());
-        //ÔÊĞíÔ¶³ÌÖØÆô
+        //å…è®¸è¿œç¨‹é‡å¯
         map.insert("enable-remote-restart".to_string(), "Y".to_string());
-        //ÔÊĞíÔ¶³ÌĞŞ¸ÄÅäÖÃ
+        //å…è®¸è¿œç¨‹ä¿®æ”¹é…ç½®
         map.insert("allow-remote-config-modification".to_string(), "Y".to_string());
-        //½ÓÊÜÔ¶³Ì·½Ê½£¬password£ºÃÜÂë£¬click£ºµã»÷£¬password-click£ºÍ¬Ê±Ê¹ÓÃ
+        //æ¥å—è¿œç¨‹æ–¹å¼ï¼Œpasswordï¼šå¯†ç ï¼Œclickï¼šç‚¹å‡»ï¼Œpassword-clickï¼šåŒæ—¶ä½¿ç”¨
         map.insert("approve-mode".to_string(), "password".to_string());
-        //ÃÜÂëÑéÖ¤·½Ê½£¬use-temporary-password£ºÒ»´ÎĞÔÃÜÂë£¬use-permanent-password£º¹Ì¶¨ÃÜÂë£¬use-both-passwords£ºÍ¬Ê±Ê¹ÓÃ
+        //å¯†ç éªŒè¯æ–¹å¼ï¼Œuse-temporary-passwordï¼šä¸€æ¬¡æ€§å¯†ç ï¼Œuse-permanent-passwordï¼šå›ºå®šå¯†ç ï¼Œuse-both-passwordsï¼šåŒæ—¶ä½¿ç”¨
         map.insert("verification-method".to_string(), "use-permanent-password".to_string());
-        //Ê¹ÓÃDirectX²¶»ñÆÁÄ»
+        //ä½¿ç”¨DirectXæ•è·å±å¹•
         map.insert("enable-directx-capture".to_string(), "Y".to_string());
-        //Ô¤ÉèµØÖ·²¾Ãû³Æ£¬ÆúÓÃ
-        //map.insert("preset-address-book-name".to_string(), "°Ù¶È±¾µØÉú»î".to_string());
-        //Ô¤ÉèµØÖ·²¾±êÇ©£¬ÆúÓÃ
-        //map.insert("preset-address-book-tag".to_string(), "ÊÕÒø»ú".to_string());
+        //é¢„è®¾åœ°å€ç°¿åç§°ï¼Œå¼ƒç”¨
+        //map.insert("preset-address-book-name".to_string(), "ç™¾åº¦æœ¬åœ°ç”Ÿæ´»".to_string());
+        //é¢„è®¾åœ°å€ç°¿æ ‡ç­¾ï¼Œå¼ƒç”¨
+        //map.insert("preset-address-book-tag".to_string(), "æ”¶é“¶æœº".to_string());
         RwLock::new(map)
     };
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = {
         let mut map = HashMap::new();
-        //ÏÔÊ¾Ä£Ê½£¬adaptive£ºÊÊÓ¦´°¿Ú£¬original£ºÔ­Ê¼³ß´ç£¬
+        //æ˜¾ç¤ºæ¨¡å¼ï¼Œadaptiveï¼šé€‚åº”çª—å£ï¼Œoriginalï¼šåŸå§‹å°ºå¯¸ï¼Œ
         map.insert("view_style".to_string(), "adaptive".to_string());
         RwLock::new(map)
     };
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = {
         let mut map = HashMap::new();
-        //Ê¹ÓÃD3DäÖÈ¾
+        //ä½¿ç”¨D3Dæ¸²æŸ“
         map.insert("allow-d3d-render".to_string(), "Y".to_string());
-        //½ûÓÃÆô¶¯Ê±¼ì²éÈí¼ş¸üĞÂ
+        //ç¦ç”¨å¯åŠ¨æ—¶æ£€æŸ¥è½¯ä»¶æ›´æ–°
         map.insert("enable-check-update".to_string(), "N".to_string());
-        //½ûÓÃ×Ô¶¯¸üĞÂ
+        //ç¦ç”¨è‡ªåŠ¨æ›´æ–°
         map.insert("allow-auto-update".to_string(), "N".to_string());
-        //½ûÓÃUDP´ò¶´
+        //ç¦ç”¨UDPæ‰“æ´
         map.insert("enable-udp-punch".to_string(), "N".to_string());
-        //½ûÓÃIPv6 P2PÁ¬½Ó
+        //ç¦ç”¨IPv6 P2Pè¿æ¥
         map.insert("enable-ipv6-punch".to_string(), "N".to_string());
-        //½ûÓÃ·¢ÏÖÑ¡Ïî¿¨
+        //ç¦ç”¨å‘ç°é€‰é¡¹å¡
         map.insert("disable-discovery-panel".to_string(), "Y".to_string());
-        //½ûÓÃÄ¬ÈÏÌáÈ¨ÔËĞĞ
+        //ç¦ç”¨é»˜è®¤ææƒè¿è¡Œ
         map.insert("pre-elevate-service".to_string(), "N".to_string());
-        //½ûÓÃ±»¿Ø¶Ë¸ü¸ÄÁ¬½ÓÈ¨ÏŞ
+        //ç¦ç”¨è¢«æ§ç«¯æ›´æ”¹è¿æ¥æƒé™
         map.insert("allow-remote-cm-modification".to_string(), "N".to_string());
         RwLock::new(map)
     };
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
         let mut map = HashMap::new();
-        //±»¿ØÄ¬ÈÏÃÜÂë£¬ÆúÓÃ
+        //è¢«æ§é»˜è®¤å¯†ç ï¼Œå¼ƒç”¨
         //map.insert("password".to_string(), "~Baidu1234456789~".to_string());
         RwLock::new(map)
     };
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = {
         let mut map = HashMap::new();
-        //Ô¤ÉèÓÃ»§Ãû³Æ
+        //é¢„è®¾ç”¨æˆ·åç§°
         map.insert("preset-user-name".to_string(), "nk".to_string());
-        //Ô¤ÉèÉè±¸×éÃû³Æ£¬ÆúÓÃ
-        //map.insert("preset-device-group-name".to_string(), "°Ù¶ÈÉè±¸".to_string());
-        //Òş²ØÁ¬½Ó¹ÜÀí´°¿Ú£¬²»ÉúĞ§£¬ÏîÄ¿ÖĞÈ·ÊµÓĞ¸Ã×Ö¶ÎµÄÅäÖÃĞÅÏ¢£¬µ«ÊÇÎŞ·¨ÔÚ´Ë´¦¶¨Òå£¬Ï£Íû´óÉñÄÜ½â¾ö£¬ÆúÓÃ
+        //é¢„è®¾è®¾å¤‡ç»„åç§°ï¼Œå¼ƒç”¨
+        //map.insert("preset-device-group-name".to_string(), "ç™¾åº¦è®¾å¤‡".to_string());
+        //éšè—è¿æ¥ç®¡ç†çª—å£ï¼Œä¸ç”Ÿæ•ˆï¼Œé¡¹ç›®ä¸­ç¡®å®æœ‰è¯¥å­—æ®µçš„é…ç½®ä¿¡æ¯ï¼Œä½†æ˜¯æ— æ³•åœ¨æ­¤å¤„å®šä¹‰ï¼Œå¸Œæœ›å¤§ç¥èƒ½è§£å†³ï¼Œå¼ƒç”¨
         //map.insert("allow-hide-cm".to_string(), "Y".to_string());
-        //Òş²ØÍĞÅÌÍ¼±ê£¬ÆúÓÃ
+        //éšè—æ‰˜ç›˜å›¾æ ‡ï¼Œå¼ƒç”¨
         //map.insert("hide-tray".to_string(), "Y".to_string());
-        //Ä¬ÈÏÁ¬½ÓÃÜÂë£¬ÆúÓÃ
+        //é»˜è®¤è¿æ¥å¯†ç ï¼Œå¼ƒç”¨ã€‚
         //map.insert("default-connect-password".to_string(), "~Baidu1234456789~".to_string());
         RwLock::new(map)
     };
@@ -522,7 +522,7 @@ fn patch(path: PathBuf) -> PathBuf {
     path
 }
 
-//Ìæ»»ÎªÒÔÏÂ£º
+//æ›¿æ¢ä¸ºä»¥ä¸‹ï¼š
     fn load() -> Config2 {
         let mut config = Config::load_::<Config2>("2");
         let mut store = false;
@@ -533,7 +533,7 @@ fn patch(path: PathBuf) -> PathBuf {
             config.socks = Some(socks);
             store |= store2;
         }
-        // Èô unlock_pin Îª¿Õ£¬Ôò»ØÍËµ½ DEFAULT_SETTINGS ÖĞµÄÖµ
+        // è‹¥ unlock_pin ä¸ºç©ºï¼Œåˆ™å›é€€åˆ° DEFAULT_SETTINGS ä¸­çš„å€¼
         if config.unlock_pin.is_empty() {
             if let Some(default_pin) = DEFAULT_SETTINGS.read().unwrap().get("unlock_pin") {
                 config.unlock_pin = default_pin.clone();
